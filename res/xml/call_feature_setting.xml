@@ -195,6 +195,21 @@
       android:defaultValue="false"
       android:summary="@string/bg_incall_summary"/>
 
+  <ListPreference
+      android:key="flip_action"
+      android:title="@string/flip_action_title"
+      android:dialogTitle="@string/flip_action_dialog_title"
+      android:entries="@array/flip_action_setting_entries"
+      android:entryValues="@array/flip_action_setting_values"
+      android:persistent="false" />
+
+  <CheckBoxPreference
+        android:key="button_smart_phone_call"
+        android:title="@string/smart_phone_call_title"
+        android:summary="@string/smart_phone_call_summary"
+        android:persistent="false"
+        android:defaultValue="false" />
+
   <PreferenceScreen
       android:key="button_respond_via_sms_key"
       android:title="@string/respond_via_sms_setting_title"
@@ -269,12 +284,5 @@
             android:targetPackage="com.android.phone"
             android:targetClass="com.android.phone.CdmaCallOptions"/>
     </PreferenceScreen>
-
-    <CheckBoxPreference
-        android:key="button_smart_phone_call"
-        android:title="@string/smart_phone_call_title"
-        android:summary="@string/smart_phone_call_summary"
-        android:persistent="false"
-        android:defaultValue="false" />
 
 </PreferenceScreen>
