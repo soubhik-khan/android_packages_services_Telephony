@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    
+    <!-- Call UI in background -->
+    <string name="bg_incall">Chamada de entrada no fundo</string>
+    <string name="bg_incall_summary">Manter a chamada de entrada no fundo quando a tela estiver ligada. Somente mostrar notificação e reproduzir som do toque</string>
+
+    <!-- Smart Phone Call -->
+    <string name="smart_phone_call_title">Chamada inteligente</string>
+    <string name="smart_phone_call_summary">Colocar no ouvido para ligação ser feita automaticamente ao o número atual no discador ou em mensagens</string>
+
+</resources>
