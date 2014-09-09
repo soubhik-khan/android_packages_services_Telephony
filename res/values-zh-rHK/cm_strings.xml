@@ -16,6 +16,21 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="call_notif_unconditionalCF">開啟無條件地來電轉駁</string>
+  <string name="call_notif_conditionalCF">開啟有條件地來電轉駁</string>
+  <string name="call_notif_MOcall_forwarding">撥出通話已轉駁</string>
+  <string name="call_notif_cugcall">致電非公開使用者群組</string>
+  <string name="call_notif_outgoing_barred">禁止撥出電話</string>
+  <string name="call_notif_incoming_barred">來電通話禁止於遠端系統</string>
+  <string name="call_notif_clir_suppression_rejected">本機號碼被制止拒絕了網絡</string>
+  <string name="call_notif_call_deflected">由遠端系統啟用通話轉駁</string>
+  <string name="call_notif_MTcall_forwarding">來電通話已轉駁</string>
+  <string name="call_notif_multipartycall">多方通話</string>
+  <string name="call_notif_callonhold_released">通話被對方釋放</string>
+  <string name="call_notif_forwardcheckreceived">通話被轉駁</string>
+  <string name="call_notif_callconnectingect">致電透過顯式的來電轉接進行連接</string>
+  <string name="call_notif_callconnectedect">致電透過顯式的來電轉接進行連接</string>
+  <string name="incall_vibration">通話震動</string>
   <string name="vibrate_outgoing">當接聽時震動</string>
   <string name="vibrate_call_waiting">當通話等待時震動</string>
   <string name="vibrate_hangup">當通話結束時震動</string>
