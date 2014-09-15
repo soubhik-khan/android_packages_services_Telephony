@@ -181,15 +181,12 @@ public class CallFeaturesSetting extends PreferenceActivity
     private static final String BUTTON_PLAY_DTMF_TONE  = "button_play_dtmf_tone";
     private static final String BUTTON_DTMF_KEY        = "button_dtmf_settings";
     private static final String BUTTON_RETRY_KEY       = "button_auto_retry_key";
-    
+
     private static final String BUTTON_INCOMING_CALL_STYLE = "button_incoming_call_style";
 
     private static final String BUTTON_PROXIMITY_KEY   = "button_proximity_key";
     private static final String BUTTON_IPPREFIX_KEY = "button_ipprefix_key";
     private static final String BUTTON_EMERGENCY_CALL_KEY = "emergency_call_list";
-
-    private static final String BUTTON_CALL_UI_IN_BACKGROUND = "bg_incall_screen";
-    private static final String BUTTON_CALL_UI_AS_HEADS_UP = "bg_incall_screen_as_heads_up";
 
     protected static final String BUTTON_GSM_UMTS_OPTIONS = "button_gsm_more_expand_key";
     protected static final String BUTTON_CDMA_OPTIONS = "button_cdma_more_expand_key";
@@ -228,6 +225,9 @@ public class CallFeaturesSetting extends PreferenceActivity
     private static final String BUTTON_CHOOSE_REVERSE_LOOKUP_PROVIDER =
             "button_choose_reverse_lookup_provider";
 
+    // crDroid custom features
+    private static final String BUTTON_CALL_UI_IN_BACKGROUND = "bg_incall_screen";
+    private static final String BUTTON_CALL_UI_AS_HEADS_UP = "bg_incall_screen_as_heads_up";
     private static final String BUTTON_SMART_PHONE_CALL_KEY = "button_smart_phone_call";
     private static final String FLIP_ACTION_KEY = "flip_action";
 
@@ -333,8 +333,6 @@ public class CallFeaturesSetting extends PreferenceActivity
     private CheckBoxPreference mPlayDtmfTone;
     private CheckBoxPreference mButtonAutoRetry;
     private CheckBoxPreference mButtonHAC;
-    private CheckBoxPreference mButtonCallUiInBackground;
-    private CheckBoxPreference mButtonCallUiAsHeadsUp;
     private ListPreference mButtonDTMF;
     private ListPreference mButtonTTY;
     private CheckBoxPreference mButtonNoiseSuppression;
@@ -355,8 +353,11 @@ public class CallFeaturesSetting extends PreferenceActivity
     private ListPreference mChooseReverseLookupProvider;
     private ListPreference mT9SearchInputLocale;
     private CheckBoxPreference mButtonProximity;
-    private CheckBoxPreference mSmartCall;
-    private ListPreference mFlipAction;
+    // crDroid
+    private CheckBoxPreference mButtonCallUiInBackground;
+    private CheckBoxPreference mButtonCallUiAsHeadsUp;
+    private CheckBoxPreference mButtonSmartCall;
+    private ListPreference mButtonFlipAction;
 
     private class VoiceMailProvider {
         public VoiceMailProvider(String name, Intent intent) {
@@ -627,10 +628,6 @@ public class CallFeaturesSetting extends PreferenceActivity
             // Update HAC Value in AudioManager
             mAudioManager.setParameter(HAC_KEY, hac != 0 ? HAC_VAL_ON : HAC_VAL_OFF);
             return true;
-        } else if (preference == mSmartCall) {
-            Settings.System.putInt(getContentResolver(), Settings.System.SMART_PHONE_CALLER,
-                    mSmartCall.isChecked() ? 1 : 0);
-            return true;
         } else if (preference == mSubMenuVoicemailSettings) {
             return true;
         } else if (preference == mVoicemailSettings) {
@@ -654,6 +651,10 @@ public class CallFeaturesSetting extends PreferenceActivity
                 // This should let the preference use default behavior in the xml.
                 return false;
             }
+        } else if (preference == mButtonSmartCall) {
+            Settings.System.putInt(getContentResolver(), Settings.System.SMART_PHONE_CALLER,
+                    mButtonSmartCall.isChecked() ? 1 : 0);
+            return true;
         }
         return false;
     }
@@ -690,18 +691,6 @@ public class CallFeaturesSetting extends PreferenceActivity
                     Constants.SETTINGS_PROXIMITY_SENSOR, checked ? 1 : 0);
             mButtonProximity.setSummary(checked ? R.string.proximity_on_summary
                     : R.string.proximity_off_summary);
-        } else if (preference == mButtonCallUiInBackground) {
-            Settings.System.putInt(mPhone.getContext().getContentResolver(),
-                    Settings.System.CALL_UI_IN_BACKGROUND,
-                    (Boolean) objValue ? 1 : 0);
-        } else if (preference == mButtonCallUiAsHeadsUp) {
-            Settings.System.putInt(mPhone.getContext().getContentResolver(),
-                    Settings.System.CALL_UI_AS_HEADS_UP,
-                    (Boolean) objValue ? 1 : 0);
-        } else if (preference == mMwiNotification) {
-            int mwi_notification = mMwiNotification.isChecked() ? 1 : 0;
-            Settings.System.putInt(mPhone.getContext().getContentResolver(),
-                    Settings.System.ENABLE_MWI_NOTIFICATION, mwi_notification);
         } else if (preference == mVoicemailProviders) {
             final String newProviderKey = (String) objValue;
             log("Voicemail Provider changes from \"" + mPreviousVMProviderKey
@@ -745,20 +734,26 @@ public class CallFeaturesSetting extends PreferenceActivity
             saveLookupProviderSetting(preference, (String) objValue);
         } else if (preference == mT9SearchInputLocale) {
             saveT9SearchInputLocale(preference, (String) objValue);
-        } else if (preference == mFlipAction) {
-            int index = mFlipAction.findIndexOfValue((String) objValue);
+        } else if (preference == mButtonCallUiInBackground) {
+            return true;
+        } else if (preference == mButtonFlipAction) {
+            int index = mButtonFlipAction.findIndexOfValue((String) objValue);
             Settings.System.putInt(getContentResolver(),
                 Settings.System.CALL_FLIP_ACTION_KEY, index);
             updateFlipActionSummary(index);
+        } else if (preference == mButtonCallUiAsHeadsUp) {
+            Settings.System.putInt(mPhone.getContext().getContentResolver(),
+                Settings.System.CALL_UI_AS_HEADS_UP,
+                (Boolean) objValue ? 1 : 0);
         }
         // always let the preference setting proceed.
         return true;
     }
 
     private void updateFlipActionSummary(int value) {
-        if (mFlipAction != null) {
+        if (mButtonFlipAction != null) {
             String[] summaries = getResources().getStringArray(R.array.flip_action_summary_entries);
-            mFlipAction.setSummary(getString(R.string.flip_action_summary, summaries[value]));
+            mButtonFlipAction.setSummary(getString(R.string.flip_action_summary, summaries[value]));
         }
     }
 
@@ -1690,8 +1685,6 @@ public class CallFeaturesSetting extends PreferenceActivity
         mButtonAutoRetry = (CheckBoxPreference) findPreference(BUTTON_RETRY_KEY);
         mButtonHAC = (CheckBoxPreference) findPreference(BUTTON_HAC_KEY);
         mButtonTTY = (ListPreference) findPreference(BUTTON_TTY_KEY);
-        mButtonCallUiInBackground = (CheckBoxPreference) findPreference(BUTTON_CALL_UI_IN_BACKGROUND);
-        mButtonCallUiAsHeadsUp = (CheckBoxPreference) findPreference(BUTTON_CALL_UI_AS_HEADS_UP);
         mButtonNoiseSuppression = (CheckBoxPreference) findPreference(BUTTON_NOISE_SUPPRESSION_KEY);
 
         mButtonBlacklist = (PreferenceScreen) findPreference(BUTTON_BLACKLIST);
@@ -1699,7 +1692,12 @@ public class CallFeaturesSetting extends PreferenceActivity
         mIncomingCallStyle = (ListPreference) findPreference(BUTTON_INCOMING_CALL_STYLE);
         mButtonProximity = (CheckBoxPreference) findPreference(BUTTON_PROXIMITY_KEY);
         mIPPrefix = (PreferenceScreen) findPreference(BUTTON_IPPREFIX_KEY);
-        mFlipAction = (ListPreference) findPreference(FLIP_ACTION_KEY);
+
+        // crDroid
+        mButtonCallUiInBackground = (CheckBoxPreference) findPreference(BUTTON_CALL_UI_IN_BACKGROUND);
+        mButtonCallUiAsHeadsUp = (CheckBoxPreference) findPreference(BUTTON_CALL_UI_AS_HEADS_UP);
+        mButtonSmartCall = (CheckBoxPreference) findPreference(BUTTON_SMART_PHONE_CALL_KEY);
+        mButtonFlipAction = (ListPreference) findPreference(FLIP_ACTION_KEY);
 
         if (mT9SearchInputLocale != null) {
             initT9SearchInputPreferenceList();
@@ -1763,26 +1761,30 @@ public class CallFeaturesSetting extends PreferenceActivity
             mT9SearchInputLocale.setOnPreferenceChangeListener(this);
         }
 
+        // Incoming call ui in bg
         if (mButtonCallUiInBackground != null) {
             mButtonCallUiInBackground.setOnPreferenceChangeListener(this);
         }
 
+        // Incoming call heads up
         if (mButtonCallUiAsHeadsUp!= null) {
             mButtonCallUiAsHeadsUp.setOnPreferenceChangeListener(this);
         }
 
-        if (mFlipAction != null) {
-            mFlipAction.setOnPreferenceChangeListener(this);
+        // Smart phone call
+        if (mButtonSmartCall != null) {
+            mButtonSmartCall.setOnPreferenceChangeListener(this);
+        }
+
+        // Flip action
+        if (mButtonFlipAction != null) {
+            mButtonFlipAction.setOnPreferenceChangeListener(this);
         }
 
         removeOptionalPrefs(prefSet);
         addOptionalPrefs(prefSet);
 
         onCreateLookupPrefs();
-
-        mSmartCall = (CheckBoxPreference) findPreference(BUTTON_SMART_PHONE_CALL_KEY);
-        mSmartCall.setChecked(Settings.System.getInt(getContentResolver(),
-                Settings.System.SMART_PHONE_CALLER, 0) != 0 ? true : false);
 
         // create intent to bring up contact list
         mContactListIntent = new Intent(Intent.ACTION_GET_CONTENT);
@@ -1941,31 +1943,40 @@ public class CallFeaturesSetting extends PreferenceActivity
             updatePreferredTtyModeSummary(settingsTtyMode);
         }
 
-        if (mButtonCallUiInBackground != null) {
-            int callUiInBackground = Settings.System.getInt(getContentResolver(),
-                    Settings.System.CALL_UI_IN_BACKGROUND, 1);
-            mButtonCallUiInBackground.setChecked(callUiInBackground != 0);
-        }
-
-        if (mButtonCallUiAsHeadsUp != null) {
-            int callUiAsHeadsUp = Settings.System.getInt(getContentResolver(),
-                    Settings.System.CALL_UI_AS_HEADS_UP, 1);
-            mButtonCallUiAsHeadsUp.setChecked(callUiAsHeadsUp != 0);
-        }
-
-        if (mFlipAction != null) {
-            int flipAction = Settings.System.getInt(getContentResolver(),
-                    Settings.System.CALL_FLIP_ACTION_KEY, 2);
-            mFlipAction.setValue(String.valueOf(flipAction));
-            updateFlipActionSummary(flipAction);
-        }
-
         if (mButtonProximity != null) {
             boolean checked = Settings.System.getInt(getContentResolver(),
                     Constants.SETTINGS_PROXIMITY_SENSOR, 1) == 1;
             mButtonProximity.setChecked(checked);
             mButtonProximity.setSummary(checked ? R.string.proximity_on_summary
                     : R.string.proximity_off_summary);
+        }
+
+        // Incoming call ui in bg
+        if (mButtonCallUiInBackground != null) {
+            int callUiInBackground = Settings.System.getInt(getContentResolver(),
+                    Settings.System.CALL_UI_IN_BACKGROUND, 1);
+            mButtonCallUiInBackground.setChecked(callUiInBackground != 0);
+        }
+
+        // Incoming call heads up
+        if (mButtonCallUiAsHeadsUp != null) {
+            int callUiAsHeadsUp = Settings.System.getInt(getContentResolver(),
+                    Settings.System.CALL_UI_AS_HEADS_UP, 1);
+            mButtonCallUiAsHeadsUp.setChecked(callUiAsHeadsUp != 0);
+        }
+
+        // Smart phone call
+        if (mButtonSmartCall != null) {
+            mButtonSmartCall.setChecked(Settings.System.getInt(getContentResolver(),
+                Settings.System.SMART_PHONE_CALLER, 0) != 0 ? true : false);
+        }
+
+        // Flip action
+        if (mButtonFlipAction != null) {
+            int flipAction = Settings.System.getInt(getContentResolver(),
+                    Settings.System.CALL_FLIP_ACTION_KEY, 2);
+            mButtonFlipAction.setValue(String.valueOf(flipAction));
+            updateFlipActionSummary(flipAction);
         }
 
         updateBlacklistSummary();

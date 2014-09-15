@@ -231,7 +231,7 @@
       android:persistent="false"
       android:summary="@string/proximity_on_summary" />
 
-  <CheckBoxPreference
+   <CheckBoxPreference
       android:key="bg_incall_screen"
       android:title="@string/bg_incall"
       android:persistent="false"
@@ -246,6 +246,13 @@
       android:dependency="bg_incall_screen"
       android:summary="@string/bg_incall_as_heads_up_summary"/>
 
+  <CheckBoxPreference
+      android:key="button_smart_phone_call"
+      android:title="@string/smart_phone_call_title"
+      android:summary="@string/smart_phone_call_summary"
+      android:persistent="false"
+      android:defaultValue="false" />
+
   <ListPreference
       android:key="flip_action"
       android:title="@string/flip_action_title"
@@ -253,13 +260,6 @@
       android:entries="@array/flip_action_setting_entries"
       android:entryValues="@array/flip_action_setting_values"
       android:persistent="false" />
-
-  <CheckBoxPreference
-      android:key="button_smart_phone_call"
-      android:title="@string/smart_phone_call_title"
-      android:summary="@string/smart_phone_call_summary"
-      android:persistent="false"
-      android:defaultValue="false" />
 
   <PreferenceScreen
       android:key="button_respond_via_sms_key"
