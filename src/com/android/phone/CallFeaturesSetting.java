@@ -735,7 +735,9 @@ public class CallFeaturesSetting extends PreferenceActivity
         } else if (preference == mT9SearchInputLocale) {
             saveT9SearchInputLocale(preference, (String) objValue);
         } else if (preference == mButtonCallUiInBackground) {
-            return true;
+            Settings.System.putInt(mPhone.getContext().getContentResolver(),
+                Settings.System.CALL_UI_IN_BACKGROUND,
+                (Boolean) objValue ? 1 : 0);
         } else if (preference == mButtonFlipAction) {
             int index = mButtonFlipAction.findIndexOfValue((String) objValue);
             Settings.System.putInt(getContentResolver(),
