@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    
+    <!-- Call UI in background -->
+    <string name="bg_incall">Chiamata entrante in background</string>
+    <string name="bg_incall_summary">Tenere UI di chiamata entrante in background quando lo schermo è acceso, mostra notifica e suona.</string>
+    <string name="bg_incall_as_heads_up">Mostra come heads up</string>
+    <string name="bg_incall_as_heads_up_summary">Mostra chiamata entrante in background come notifica heads up</string>
+
+    <!-- Smart Phone Call -->
+    <string name="smart_phone_call_title">Chiamata intelligente</string>
+    <string name="smart_phone_call_summary">avvicina al tuo orecchio, e questo chiamerà automaticamente il numero corrente in un messaggio o dialer</string>
+
+    <!-- Setting title for the flip action setting. -->
+    <string name="flip_action_title">Azione di capovolta</string>
+
+    <!-- Dialog title of the flip action setting. -->
+    <string name="flip_action_dialog_title">Capovolgi dispositivo per\u2026</string>
+
+    <!-- Setting summary for the flip action setting. -->
+    <string name="flip_action_summary">Capovolgendo il dispositivo farà <xliff:g id="action">%s</xliff:g></string>
+
+    <!-- Values for flip action array entries -->
+    <string name="entry_do_nothing">Non fare nulla</string>
+    <string name="entry_mute_ringer">Dissattiva suoneria</string>
+    <string name="entry_dismiss_call">Respinge chiamata</string>
+    <string name="summary_do_nothing">Nulla</string>
+    <string name="summary_mute_ringer">dissattivare la suoneria</string>
+    <string name="summary_dismiss_call">respingere la chiamata</string>
+
+</resources>
