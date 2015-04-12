@@ -193,8 +193,9 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
 
     private static final String BUTTON_IPPREFIX_KEY = "button_ipprefix_key";
 
-
     private static final String VM_NUMBERS_SHARED_PREFERENCES_NAME = "vm_numbers";
+
+    private static final String FLIP_ACTION_KEY = "flip_action";
 
     private Intent mContactListIntent;
 
@@ -252,6 +253,8 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
     private PreferenceScreen mButtonVideoCallPictureSelect;
 
     private EditPhoneNumberPreference mSubMenuVoicemailSettings;
+
+    private ListPreference mFlipAction;
 
     private Runnable mRingtoneLookupRunnable;
     private final Handler mRingtoneLookupComplete = new Handler() {
@@ -613,10 +616,22 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
             .edit()
             .putBoolean(BUTTON_VOICEMAIL_NOTIFICATION_VIBRATE_KEY + mPhone.getPhoneId(),
                     mVoicemailNotificationVibrate.isChecked()).commit();
+        } else if (preference == mFlipAction) {
+            int index = mFlipAction.findIndexOfValue((String) objValue);
+            Settings.System.putInt(getContentResolver(),
+                Settings.System.CALL_FLIP_ACTION_KEY, index);
+            updateFlipActionSummary(index);
         }
         // always let the preference setting proceed.
         return true;
     }
+
+    private void updateFlipActionSummary(int value) {
+        if (mFlipAction != null) {
+            String[] summaries = getResources().getStringArray(R.array.flip_action_summary_entries);
+            mFlipAction.setSummary(getString(R.string.flip_action_summary, summaries[value]));
+        }
+	}
 
     @Override
     public void onDialogClosed(EditPhoneNumberPreference preference, int buttonClicked) {
@@ -1551,6 +1566,8 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
             mSubMenuVoicemailSettings.setDialogTitle(R.string.voicemail_settings_number_label);
         }
 
+        mFlipAction = (ListPreference) findPreference(FLIP_ACTION_KEY);
+
         mRingtonePreference = (DefaultRingtonePreference) findPreference(BUTTON_RINGTONE_KEY);
         if (mRingtonePreference != null) {
             mRingtonePreference.setSubId(mPhone.getPhoneId());
@@ -1574,6 +1591,11 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
         }
 
         if (!getResources().getBoolean(R.bool.world_phone)) {
+
+        if (mFlipAction != null) {
+            mFlipAction.setOnPreferenceChangeListener(this);
+        }
+
             Preference options = prefSet.findPreference(BUTTON_CDMA_OPTIONS);
             if (options != null)
                 prefSet.removePreference(options);
@@ -1704,6 +1726,12 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
             } else {
                 mIPPrefixPreference.setSummary(ip_prefix);
             }
+        }
+        if (mFlipAction != null) {
+            int flipAction = Settings.System.getInt(getContentResolver(),
+                    Settings.System.CALL_FLIP_ACTION_KEY, 2);
+            mFlipAction.setValue(String.valueOf(flipAction));
+            updateFlipActionSummary(flipAction);
         }
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(
