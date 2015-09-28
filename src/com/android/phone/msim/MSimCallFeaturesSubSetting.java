@@ -26,6 +26,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -41,12 +42,14 @@ import android.os.AsyncResult;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.os.SystemProperties;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
+import android.preference.SlimSeekBarPreference;
 import android.preference.SwitchPreference;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.provider.Settings;
@@ -195,6 +198,10 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
 
     private static final String VM_NUMBERS_SHARED_PREFERENCES_NAME = "vm_numbers";
 
+    private static final String PROX_AUTO_SPEAKER  = "prox_auto_speaker";
+    private static final String PROX_AUTO_SPEAKER_DELAY  = "prox_auto_speaker_delay";
+    private static final String PROX_AUTO_SPEAKER_INCALL_ONLY  = "prox_auto_speaker_incall_only";
+
     private static final String FLIP_ACTION_KEY = "flip_action";
 
     private Intent mContactListIntent;
@@ -253,6 +260,10 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
     private PreferenceScreen mButtonVideoCallPictureSelect;
 
     private EditPhoneNumberPreference mSubMenuVoicemailSettings;
+
+    private SwitchPreference mProxSpeaker;
+    private SlimSeekBarPreference mProxSpeakerDelay;
+    private SwitchPreference mProxSpeakerIncallOnly;
 
     private ListPreference mFlipAction;
 
@@ -559,6 +570,13 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
         } else if (preference == mButtonVideoCallPictureSelect) {
             startActivity(getVTCallImageSettingsIntent());
             return true;
+        } else if (preference == mProxSpeaker) {
+            Settings.System.putInt(getContentResolver(), Settings.System.PROXIMITY_AUTO_SPEAKER,
+                    mProxSpeaker.isChecked() ? 1 : 0);
+        } else if (preference == mProxSpeakerIncallOnly) {
+            Settings.System.putInt(getContentResolver(),
+                    Settings.System.PROXIMITY_AUTO_SPEAKER_INCALL_ONLY,
+                    mProxSpeakerIncallOnly.isChecked() ? 1 : 0);
         }
         return false;
     }
@@ -616,6 +634,10 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
             .edit()
             .putBoolean(BUTTON_VOICEMAIL_NOTIFICATION_VIBRATE_KEY + mPhone.getPhoneId(),
                     mVoicemailNotificationVibrate.isChecked()).commit();
+        } else if (preference == mProxSpeakerDelay) {
+            int delay = Integer.valueOf((String) objValue);
+            Settings.System.putInt(getContentResolver(),
+                    Settings.System.PROXIMITY_AUTO_SPEAKER_DELAY, delay);
         } else if (preference == mFlipAction) {
             int index = mFlipAction.findIndexOfValue((String) objValue);
             Settings.System.putInt(getContentResolver(),
@@ -1566,6 +1588,10 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
             mSubMenuVoicemailSettings.setDialogTitle(R.string.voicemail_settings_number_label);
         }
 
+        mProxSpeaker = (SwitchPreference) findPreference(PROX_AUTO_SPEAKER);
+        mProxSpeakerIncallOnly = (SwitchPreference) findPreference(PROX_AUTO_SPEAKER_INCALL_ONLY);
+        mProxSpeakerDelay = (SlimSeekBarPreference) findPreference(PROX_AUTO_SPEAKER_DELAY);
+
         mFlipAction = (ListPreference) findPreference(FLIP_ACTION_KEY);
 
         mRingtonePreference = (DefaultRingtonePreference) findPreference(BUTTON_RINGTONE_KEY);
@@ -1588,6 +1614,39 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
             mVoicemailNotificationVibrate.setOnPreferenceChangeListener(this);
 
             initVoiceMailProviders();
+        }
+
+        final ContentResolver contentResolver = getContentResolver();
+
+        if (mProxSpeaker != null) {
+            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+            if (pm.isWakeLockLevelSupported(
+                    PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK)
+                    && getResources().getBoolean(R.bool.config_enabled_speakerprox)) {
+                mProxSpeaker.setChecked(Settings.System.getInt(contentResolver,
+                        Settings.System.PROXIMITY_AUTO_SPEAKER, 0) == 1);
+                if (mProxSpeakerIncallOnly != null) {
+                    mProxSpeakerIncallOnly.setChecked(Settings.System.getInt(contentResolver,
+                            Settings.System.PROXIMITY_AUTO_SPEAKER_INCALL_ONLY, 0) == 1);
+                }
+                if (mProxSpeakerDelay != null) {
+                    final int proxDelay = Settings.System.getInt(getContentResolver(),
+                            Settings.System.PROXIMITY_AUTO_SPEAKER_DELAY, 100);
+                    // minimum 100 is 1 interval of the 100 multiplier
+                    mProxSpeakerDelay.setInitValue((proxDelay / 100) - 1);
+                }
+            } else {
+                prefSet.removePreference(mProxSpeaker);
+                mProxSpeaker = null;
+                if (mProxSpeakerIncallOnly != null) {
+                    prefSet.removePreference(mProxSpeakerIncallOnly);
+                    mProxSpeakerIncallOnly = null;
+                }
+                if (mProxSpeakerDelay != null) {
+                    prefSet.removePreference(mProxSpeakerDelay);
+                    mProxSpeakerDelay = null;
+                }
+            }
         }
 
         if (!getResources().getBoolean(R.bool.world_phone)) {
@@ -1740,6 +1799,15 @@ public class MSimCallFeaturesSubSetting extends PreferenceActivity
                 mPhone.getPhoneId())) {
             mVoicemailNotificationVibrate.setChecked(prefs.getBoolean(
                     BUTTON_VOICEMAIL_NOTIFICATION_VIBRATE_KEY + mPhone.getPhoneId(), false));
+        }
+
+        if (mProxSpeakerDelay != null) {
+            mProxSpeakerDelay.setDefault(100);
+            mProxSpeakerDelay.isMilliseconds(true);
+            mProxSpeakerDelay.setInterval(1);
+            mProxSpeakerDelay.minimumValue(100);
+            mProxSpeakerDelay.multiplyValue(100);
+            mProxSpeakerDelay.setOnPreferenceChangeListener(this);
         }
 
         // Look up the default/voicemail ringtone name asynchronously and update its preference.
