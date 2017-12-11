@@ -1044,7 +1044,8 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
 
     private UiccCard getUiccCardUsingSubId(int subId) {
         Phone phone = getPhone(subId);
-        return UiccController.getInstance().getUiccCard(phone.getPhoneId());
+        return phone == null ? null :
+                UiccController.getInstance().getUiccCard(phone.getPhoneId());
     }
 
     //
